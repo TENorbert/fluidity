@@ -47,6 +47,15 @@ module dmplex_reader
 
   interface
 
+     function dmplex_get_gmsh_plex(filename, plex) &
+          bind(c) result(ierr)
+       use iso_c_binding
+       implicit none
+       integer(c_int) :: ierr
+       character(c_char) :: filename(*)
+       integer(c_long), intent(out) :: plex
+     end function dmplex_get_gmsh_plex
+
      function dmplex_get_mesh_connectivity(plex, nnodes, loc, ndglno) &
           bind(c) result(ierr)
        use iso_c_binding
@@ -83,8 +92,8 @@ module dmplex_reader
 
 contains
 
-  subroutine dmplex_read_mesh_file(filename, plex)
-    character(len=*), intent(in) :: filename
+  subroutine dmplex_read_mesh_file(filename, fileformat, plex)
+    character(len=*), intent(in) :: filename, fileformat
     type(DM), intent(out) :: plex
 
     DM :: plex_parallel
@@ -92,8 +101,25 @@ contains
 
     ewrite(1,*) "In dmplex_read_mesh_file"
 
-    ! Create a DMPlex object for the ExodusII mesh
-    call DMPlexCreateExodusFromFile(MPI_COMM_FEMTOOLS, filename, PETSC_TRUE, plex, ierr)
+    ! Create a DMPlex object from the given mesh
+    select case (fileformat)
+    case("exodusii")
+       call DMPlexCreateExodusFromFile(MPI_COMM_FEMTOOLS, filename, PETSC_TRUE, plex, ierr)
+    case ("gmsh")
+       ierr = dmplex_get_gmsh_plex(filename//C_NULL_CHAR, plex)
+    case ("triangle")
+       FLAbort("Triangle mesh reader is currently disabled")
+       ! call DMPlexCreateTriangleFromFile(MPI_COMM_FEMTOOLS, filename, PETSC_TRUE, plex, ierr)
+    case default
+       ewrite(-1,*) trim(fileformat), " is not a valid format for a mesh file"
+       FLAbort("Invalid format for mesh file")
+    end select
+
+    if (ierr /= 0) then
+       ewrite(-1,*) "Unable to generate DMPlex object from mesh: "//filename
+       FLAbort("Invalid mesh file")
+    end if
+
     if (debug_level() == 2) then
        ewrite(2,*) "Sequential DMPlex derived from ExodusII mesh:"
        call DMView(plex, PETSC_VIEWER_STDOUT_WORLD, ierr)
