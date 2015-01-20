@@ -1480,11 +1480,9 @@ contains
 ! Useful for unittesting to see that petsc gives error messages at the right moment
 #if PETSC_VERSION_MINOR>=2
 subroutine petsc_test_error_handler(comm,line, func, file, dir, n, p, mess, ctx, ierr)
-#include "petsc-finclude/petsc.h"
   MPI_Comm:: comm
 #else
 subroutine petsc_test_error_handler(line, func, file, dir, n, p, mess, ctx, ierr)
-#include "petsc-finclude/petsc.h"
 #endif
   PetscInt:: line
   character(len=*):: func, file, dir
@@ -1587,7 +1585,6 @@ end module Petsc_Tools
 ! the module (and only including petsc headers and not use petsc modules)
 ! this routine calls MatGetInfo with an implicit interface.
 subroutine myMatGetInfo(A, flag, info, ierr)
-#include "petsc-finclude/petsc.h"
 Mat, intent(in):: A
 MatInfoType, intent(in):: flag
 double precision, dimension(:), intent(out):: info
