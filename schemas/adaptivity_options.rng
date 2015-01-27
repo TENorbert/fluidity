@@ -1439,13 +1439,22 @@ The return value must be a string.</a:documentation>
           <element name="from_file">
             <a:documentation>Read the mesh from file, rather than extracting it from the
 system state.</a:documentation>
-            <element name="format">
-              <a:documentation>Input mesh file format.</a:documentation>
-              <attribute name="name">
-                <value>triangle</value>
-              </attribute>
-              <ref name="comment"/>
-            </element>
+            <choice>
+              <element name="format">
+                <a:documentation>Input mesh file format.</a:documentation>
+                <attribute name="name">
+                  <value>triangle</value>
+                </attribute>
+                <ref name="comment"/>
+              </element>
+              <element name="format">
+                <a:documentation>GMSH mesh format</a:documentation>
+                <attribute name="name">
+                  <value>gmsh</value>
+                </attribute>
+                <ref name="comment"/>
+              </element>
+            </choice>
             <ref name="comment"/>
           </element>
         </optional>

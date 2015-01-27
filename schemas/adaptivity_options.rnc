@@ -1215,6 +1215,11 @@ prescribed_adaptivity =
                   element format {
                      attribute name {"triangle"},
                      comment
+                  }|
+                  ## GMSH mesh format
+                  element format {
+                     attribute name { "gmsh" },
+                     comment
                   }
                ),
                comment
